@@ -39,6 +39,20 @@ Visual Studio 工程 `poc.vcxproj` 里已经移除了默认模板生成的 `dllm
 
 ## 构建
 
+Visual Studio 构建建议选择：
+
+```text
+Release | x64
+```
+
+生成产物固定在：
+
+```text
+bin\x64\Release\poc64.dll
+```
+
+不要使用 `Win32/x86` 产物部署到 MT5 Server。`poc.vcxproj` 已经加了保护，如果选择 Win32/x86 会直接构建失败。
+
 带真实 MT5 Server API SDK 构建：
 
 ```powershell
@@ -78,3 +92,22 @@ symbol_maintenance_margin_poc.log
 ```
 
 日志会同时写入 MT5 Server 日志和本地文件，记录 hook 名称、login、symbol、服务器本地时间、分钟数、deal/order/position 编号、推导出的 margin rate type、修改前后的 `MarginRateMaintenance` 和 setter 返回码。
+
+## 部署和排查
+
+不要只把 DLL 手工复制到 `plugins` 目录。建议在 MetaTrader 5 Administrator 里选中目标服务器的 `插件` 节点，使用工具栏的 `导入` 按钮导入 `bin\x64\Release\poc64.dll`，导入成功后再点击 `新增` 并在模块下拉框里选择该 DLL。
+
+如果手工复制后重启 MT5 Server，文件消失或下拉框看不到，优先按下面顺序排查：
+
+1. 确认导入的是 `Release|x64` 生成的 `poc64.dll`，不是 `Debug` 或 `Win32/x86` 产物。
+2. 用 Visual Studio Developer PowerShell 检查 DLL：
+
+```powershell
+dumpbin /headers bin\x64\Release\poc64.dll | findstr machine
+dumpbin /exports bin\x64\Release\poc64.dll | findstr MTServer
+```
+
+期望能看到 x64/AMD64，并且导出 `MTServerAbout`、`MTServerCreate`。
+
+3. 如果 Administrator 的 `导入` 后仍看不到模块，查看 MT5 Server 日志里是否有 `LoadLibrary`、`MTServerAbout`、`version_api`、`Bad Image` 或依赖库加载失败。
+4. 如果文件在重启后消失，说明该目录可能被 MT5 Server 的模块管理、集群同步或安全软件清理；应以 Administrator `导入` 流程为准，不以手工复制为准。
