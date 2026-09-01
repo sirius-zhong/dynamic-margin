@@ -5,7 +5,7 @@
 class CPluginInstance final : public IMTServerPlugin, public IMTTradeSink {
 public:
     CPluginInstance();
-    ~CPluginInstance() override;
+    ~CPluginInstance();
 
     void Release() override;
     MTAPIRES Start(IMTServerAPI* server) override;

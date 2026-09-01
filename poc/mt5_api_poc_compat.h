@@ -66,15 +66,12 @@ struct IMTExecution;
 struct IMTConGateway;
 
 struct IMTServerPlugin {
-    virtual ~IMTServerPlugin() = default;
     virtual void Release() = 0;
     virtual MTAPIRES Start(IMTServerAPI* server) = 0;
     virtual MTAPIRES Stop() = 0;
 };
 
 struct IMTTradeSink {
-    virtual ~IMTTradeSink() = default;
-
     virtual MTAPIRES HookTradeRequestProcess(
         const IMTRequest*,
         const IMTConfirm*,
