@@ -31,8 +31,11 @@ PoC 代码按 MT5 官方 Server example 的习惯平铺在当前目录：
 - `SymbolMaintenanceMargin.cpp`：DLL 入口、`MTServerAbout`、`MTServerCreate`
 - `PluginInstance.h`：插件实例类声明
 - `PluginInstance.cpp`：`Start/Stop`、`HookTradeExecution`、`OnTradeExecution` 逻辑
+- `pch.h/.cpp`、`framework.h`：兼容 Visual Studio 默认 DLL 项目的预编译头入口，内部会包含 `stdafx.h`
 - `stdafx.h/.cpp`：对齐 MT5 官方 Server example 的预编译头/SDK 包含习惯
 - `mt5_api_poc_compat.h`：本地 stub / 真实 `MT5APIServer.h` 兼容入口
+
+Visual Studio 工程 `poc.vcxproj` 里已经移除了默认模板生成的 `dllmain.cpp` 编译项，因为插件的 `DllMain` 已在 `SymbolMaintenanceMargin.cpp` 中实现。参与编译的 `.cpp` 第一行需要保持为 `#include "pch.h"`，否则开启预编译头时会触发 `C1010`。
 
 ## 构建
 

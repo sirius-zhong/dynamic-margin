@@ -1,8 +1,16 @@
 #pragma once
 
-#if !defined(POC_USE_STUB_MT5_API) && __has_include("MT5APIServer.h")
+#if defined(POC_USE_STUB_MT5_API)
+#define POC_USING_STUB_MT5_API 1
+#elif __has_include("MT5APIServer.h")
 #include "MT5APIServer.h"
+#elif __has_include("../MetaTrader5SDK/Include/MT5APIServer.h")
+#include "../MetaTrader5SDK/Include/MT5APIServer.h"
 #else
+#error "Cannot find MT5APIServer.h. Add MetaTrader5SDK/Include to the include path, or define POC_USE_STUB_MT5_API only for local smoke tests."
+#endif
+
+#if defined(POC_USING_STUB_MT5_API)
 
 #include <cstdint>
 
